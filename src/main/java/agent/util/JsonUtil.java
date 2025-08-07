@@ -19,4 +19,15 @@ public class JsonUtil {
     public static String toJson(Object object) {
         return gson.toJson(object);
     }
+
+    /**
+     * Converte uma string JSON para um objeto do tipo especificado.
+     * @param json A string JSON.
+     * @param classOfT A classe do tipo de retorno.
+     * @param <T> O tipo do objeto retornado.
+     * @return O objeto deserializado.
+     */
+    public static <T> T fromJson(String json, Class<T> classOfT) {
+        return gson.fromJson(json, classOfT);
+    }
 }

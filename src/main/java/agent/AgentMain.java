@@ -1,8 +1,12 @@
 package agent;
 
+import agent.config.ConfigurationServer;
+
 import java.lang.instrument.Instrumentation;
 
 public class AgentMain {
+
+    private static ConfigurationServer configServer;
 
     /**
      * Ponto de entrada do agente Java, chamado antes do método main da aplicação.
@@ -25,11 +29,40 @@ public class AgentMain {
 
         System.out.println("Agente '" + config.getAgentName() + "' monitorando a aplicação '" + config.getApplicationName() + "'");
 
+        // Inicializa o servidor de configuração dinâmica se habilitado
+        if (config.isConfigServerEnabled()) {
+            try {
+                configServer = new ConfigurationServer(config);
+                configServer.start();
+                
+                // Adiciona shutdown hook para parar o servidor graciosamente
+                Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                    if (configServer != null) {
+                        configServer.stop();
+                    }
+                }));
+                
+            } catch (Exception e) {
+                System.err.println("ERRO: Falha ao inicializar servidor de configuração: " + e.getMessage());
+                System.err.println("Continuando sem servidor de configuração dinâmica...");
+            }
+        } else {
+            System.out.println("Servidor de configuração dinâmica está desabilitado.");
+        }
+
         // Próximos passos:
         // 1. Iniciar o agendador de métricas (MetricsScheduler)
         // 2. Aplicar instrumentação SQL (SqlInstrumentation)
         // 3. Configurar o handler de exceções (ExceptionHandler)
 
         System.out.println("Agente inicializado com sucesso.");
+    }
+
+    /**
+     * Retorna a instância do servidor de configuração (para testes).
+     * @return ConfigurationServer ou null se não estiver inicializado
+     */
+    public static ConfigurationServer getConfigServer() {
+        return configServer;
     }
 }
