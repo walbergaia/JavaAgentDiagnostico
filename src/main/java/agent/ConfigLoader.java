@@ -145,6 +145,22 @@ public class ConfigLoader {
     public boolean isSystemCpuMemEnabled() { return getBooleanProperty("enable.system.cpu.mem", true); }
     public boolean isIoMetricsEnabled() { return getBooleanProperty("enable.io.metrics", false); }
 
+    // --- Configurações REST avançadas ---
+    public int getRestTimeoutMs() { return getIntProperty("rest.timeout.ms", 5000); }
+    public int getRestRetryMaxAttempts() { return getIntProperty("rest.retry.max.attempts", 3); }
+    public int getRestRetryBackoffInitialMs() { return getIntProperty("rest.retry.backoff.initial.ms", 1000); }
+    public String getRestAuthHeaderName() { return getProperty("rest.auth.header.name", null); }
+    public String getRestAuthHeaderValue() { return getProperty("rest.auth.header.value", null); }
+
+    // --- Configurações de armazenamento local ---
+    public boolean isLocalStorageEnabled() { return getBooleanProperty("local.storage.enabled", true); }
+    public String getLocalStoragePath() { return getProperty("local.storage.path", System.getProperty("java.io.tmpdir") + "/javaagent-diagnostico"); }
+    public int getLocalStorageMaxFiles() { return getIntProperty("local.storage.max.files", 1000); }
+    public int getLocalStorageCleanupHours() { return getIntProperty("local.storage.cleanup.hours", 24); }
+
+    // --- Configurações da fila de dados ---
+    public int getDataQueueMaxSize() { return getIntProperty("data.queue.max.size", 10000); }
+
     // --- Configurações do servidor de configuração dinâmica ---
     public boolean isConfigServerEnabled() { return getBooleanProperty("config.server.enabled", false); }
     public int getConfigServerPort() { return getIntProperty("config.server.port", 8090); }

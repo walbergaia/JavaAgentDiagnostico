@@ -9,6 +9,7 @@ agent/config/ConfigurationServer$ReloadHandler.class
 agent/MetricsScheduler.class
 agent/SqlInstrumentation$1.class
 agent/MetricsCollector$1.class
+agent/LocalStorageManager.class
 agent/models/SqlQueryInfo.class
 agent/models/HeapMetrics.class
 agent/config/ConfigurationServer.class
@@ -17,10 +18,14 @@ agent/models/MemoryMetrics.class
 agent/SqlInstrumentation.class
 agent/models/ClassLoadingMetrics.class
 agent/models/AgentMetrics.class
+agent/DataQueue$QueueItem$Priority.class
 agent/models/CpuMetrics.class
+agent/DataQueue.class
 agent/util/JsonUtil.class
 agent/config/ConfigurationServer$ConfigHandler.class
 agent/models/ExceptionInfo.class
 agent/SqlRegistry.class
 agent/models/GcMetrics.class
+agent/RetryManager.class
 agent/AgentMain.class
+agent/DataQueue$QueueItem.class
