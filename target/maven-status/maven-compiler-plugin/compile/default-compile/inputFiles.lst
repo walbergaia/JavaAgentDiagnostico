@@ -1,9 +1,12 @@
 /home/runner/work/JavaAgentDiagnostico/JavaAgentDiagnostico/src/main/java/agent/AgentMain.java
 /home/runner/work/JavaAgentDiagnostico/JavaAgentDiagnostico/src/main/java/agent/ConfigLoader.java
+/home/runner/work/JavaAgentDiagnostico/JavaAgentDiagnostico/src/main/java/agent/DataQueue.java
 /home/runner/work/JavaAgentDiagnostico/JavaAgentDiagnostico/src/main/java/agent/ExceptionHandler.java
+/home/runner/work/JavaAgentDiagnostico/JavaAgentDiagnostico/src/main/java/agent/LocalStorageManager.java
 /home/runner/work/JavaAgentDiagnostico/JavaAgentDiagnostico/src/main/java/agent/MetricsCollector.java
 /home/runner/work/JavaAgentDiagnostico/JavaAgentDiagnostico/src/main/java/agent/MetricsScheduler.java
 /home/runner/work/JavaAgentDiagnostico/JavaAgentDiagnostico/src/main/java/agent/RestClient.java
+/home/runner/work/JavaAgentDiagnostico/JavaAgentDiagnostico/src/main/java/agent/RetryManager.java
 /home/runner/work/JavaAgentDiagnostico/JavaAgentDiagnostico/src/main/java/agent/SqlInstrumentation.java
 /home/runner/work/JavaAgentDiagnostico/JavaAgentDiagnostico/src/main/java/agent/SqlRegistry.java
 /home/runner/work/JavaAgentDiagnostico/JavaAgentDiagnostico/src/main/java/agent/config/ConfigurationServer.java
