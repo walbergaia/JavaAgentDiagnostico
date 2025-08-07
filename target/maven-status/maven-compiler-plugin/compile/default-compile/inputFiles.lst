@@ -6,6 +6,7 @@
 /home/runner/work/JavaAgentDiagnostico/JavaAgentDiagnostico/src/main/java/agent/RestClient.java
 /home/runner/work/JavaAgentDiagnostico/JavaAgentDiagnostico/src/main/java/agent/SqlInstrumentation.java
 /home/runner/work/JavaAgentDiagnostico/JavaAgentDiagnostico/src/main/java/agent/SqlRegistry.java
+/home/runner/work/JavaAgentDiagnostico/JavaAgentDiagnostico/src/main/java/agent/config/ConfigurationServer.java
 /home/runner/work/JavaAgentDiagnostico/JavaAgentDiagnostico/src/main/java/agent/instrumentation/SqlTimingAdvice.java
 /home/runner/work/JavaAgentDiagnostico/JavaAgentDiagnostico/src/main/java/agent/models/AgentMetrics.java
 /home/runner/work/JavaAgentDiagnostico/JavaAgentDiagnostico/src/main/java/agent/models/ClassLoadingMetrics.java

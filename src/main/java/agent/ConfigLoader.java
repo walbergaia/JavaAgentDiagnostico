@@ -3,27 +3,40 @@ package agent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Carrega as configurações do arquivo agent.properties.
  * Implementado como um Singleton para garantir uma única instância.
+ * Suporta atualizações dinâmicas thread-safe.
  */
 public class ConfigLoader {
 
     private static final String CONFIG_FILE = "agent.properties";
-    private final Properties properties = new Properties();
-    private static ConfigLoader instance;
+    private final AtomicReference<Properties> properties = new AtomicReference<>(new Properties());
+    private final ConcurrentHashMap<String, String> dynamicOverrides = new ConcurrentHashMap<>();
+    private static volatile ConfigLoader instance;
 
     /**
      * Construtor privado que carrega o arquivo de propriedades do classpath.
      */
     private ConfigLoader() {
+        loadFromFile();
+    }
+
+    /**
+     * Carrega configurações do arquivo agent.properties.
+     */
+    private void loadFromFile() {
+        Properties newProperties = new Properties();
         try (InputStream input = getClass().getClassLoader().getResourceAsStream(CONFIG_FILE)) {
             if (input == null) {
                 System.err.println("AVISO: Arquivo de configuração não encontrado: " + CONFIG_FILE + ". Usando valores padrão.");
                 return;
             }
-            properties.load(input);
+            newProperties.load(input);
+            properties.set(newProperties);
             System.out.println("Configuração carregada de " + CONFIG_FILE);
         } catch (IOException ex) {
             System.err.println("ERRO: Falha ao carregar o arquivo de configuração " + CONFIG_FILE + ". Usando valores padrão.");
@@ -36,20 +49,74 @@ public class ConfigLoader {
      *
      * @return A instância do ConfigLoader.
      */
-    public static synchronized ConfigLoader getInstance() {
+    public static ConfigLoader getInstance() {
         if (instance == null) {
-            instance = new ConfigLoader();
+            synchronized (ConfigLoader.class) {
+                if (instance == null) {
+                    instance = new ConfigLoader();
+                }
+            }
         }
         return instance;
     }
 
+    /**
+     * Recarrega configurações do arquivo agent.properties.
+     * Remove todas as configurações dinâmicas.
+     */
+    public synchronized void reloadFromFile() {
+        System.out.println("Recarregando configurações do arquivo " + CONFIG_FILE);
+        dynamicOverrides.clear();
+        loadFromFile();
+    }
+
+    /**
+     * Atualiza uma configuração dinamicamente.
+     * @param key Chave da configuração
+     * @param value Novo valor
+     */
+    public void setProperty(String key, String value) {
+        if (key == null || value == null) {
+            throw new IllegalArgumentException("Key e value não podem ser null");
+        }
+        dynamicOverrides.put(key, value);
+        System.out.println("Configuração dinâmica atualizada: " + key + " = " + value);
+    }
+
+    /**
+     * Remove uma configuração dinâmica, voltando ao valor do arquivo.
+     * @param key Chave da configuração
+     */
+    public void removeProperty(String key) {
+        if (key != null) {
+            dynamicOverrides.remove(key);
+            System.out.println("Configuração dinâmica removida: " + key);
+        }
+    }
+
+    /**
+     * Retorna todas as configurações atuais (arquivo + dinâmicas).
+     * @return Properties com todas as configurações
+     */
+    public Properties getAllProperties() {
+        Properties allProps = new Properties();
+        allProps.putAll(properties.get());
+        allProps.putAll(dynamicOverrides);
+        return allProps;
+    }
+
     private String getProperty(String key, String defaultValue) {
-        return properties.getProperty(key, defaultValue);
+        // Primeiro verifica override dinâmico, depois arquivo
+        String value = dynamicOverrides.get(key);
+        if (value != null) {
+            return value;
+        }
+        return properties.get().getProperty(key, defaultValue);
     }
 
     private int getIntProperty(String key, int defaultValue) {
         try {
-            String value = properties.getProperty(key);
+            String value = getProperty(key, null);
             return (value != null) ? Integer.parseInt(value) : defaultValue;
         } catch (NumberFormatException e) {
             return defaultValue;
@@ -57,7 +124,7 @@ public class ConfigLoader {
     }
 
     private boolean getBooleanProperty(String key, boolean defaultValue) {
-        String value = properties.getProperty(key);
+        String value = getProperty(key, null);
         return (value != null) ? Boolean.parseBoolean(value) : defaultValue;
     }
 
@@ -77,4 +144,10 @@ public class ConfigLoader {
     public boolean isGcMetricsEnabled() { return getBooleanProperty("enable.gc.metrics", true); }
     public boolean isSystemCpuMemEnabled() { return getBooleanProperty("enable.system.cpu.mem", true); }
     public boolean isIoMetricsEnabled() { return getBooleanProperty("enable.io.metrics", false); }
+
+    // --- Configurações do servidor de configuração dinâmica ---
+    public boolean isConfigServerEnabled() { return getBooleanProperty("config.server.enabled", false); }
+    public int getConfigServerPort() { return getIntProperty("config.server.port", 8090); }
+    public String getConfigServerAuthToken() { return getProperty("config.server.auth.token", null); }
+    public String getConfigServerBindAddress() { return getProperty("config.server.bind.address", "localhost"); }
 }
