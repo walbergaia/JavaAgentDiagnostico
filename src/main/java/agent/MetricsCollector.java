@@ -29,13 +29,11 @@ public class MetricsCollector {
 
     // Para calcular a carga da CPU, precisamos de leituras anteriores
     private long[] oldTicks;
-    private long oldProcessorCpuLoadTicks;
 
     public MetricsCollector(ConfigLoader config) {
         this.config = config;
         // Inicializa os ticks para o cálculo da CPU
-        this.oldTicks = new long[CentralProcessor.TickType.values().length];
-        this.oldProcessorCpuLoadTicks = processor.getProcessorCpuLoadTicks();
+        this.oldTicks = processor.getSystemCpuLoadTicks();
     }
 
     /**
