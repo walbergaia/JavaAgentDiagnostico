@@ -1,6 +1,12 @@
 package agent;
 
 import agent.models.*;
+import agent.sql.ConnectionPoolMonitor;
+import agent.tracing.TracingManager;
+import agent.sql.SqlAggregationRegistry;
+import agent.io.IoFileTracker;
+import agent.io.IoSocketTracker;
+import agent.models.IoMetrics;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.GlobalMemory;
@@ -9,7 +15,6 @@ import java.lang.management.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.Instant;
-import java.util.Arrays;
 
 /**
  * Coleta métricas da JVM e do sistema operacional.
@@ -29,11 +34,16 @@ public class MetricsCollector {
 
     // Para calcular a carga da CPU, precisamos de leituras anteriores
     private long[] oldTicks;
+    
+    // Monitor de connection pools
+    private final ConnectionPoolMonitor poolMonitor;
 
     public MetricsCollector(ConfigLoader config) {
         this.config = config;
         // Inicializa os ticks para o cálculo da CPU
         this.oldTicks = processor.getSystemCpuLoadTicks();
+        // Inicializa monitor de connection pools
+        this.poolMonitor = new ConnectionPoolMonitor();
     }
 
     /**
@@ -65,7 +75,47 @@ public class MetricsCollector {
             metrics.memory = collectMemoryMetrics();
         }
 
-        // Métricas de GC, Exceções e SQL serão adicionadas aqui posteriormente.
+        // Coleta GC, Exceções e SQL se habilitados
+        if (config.isGcMetricsEnabled()) {
+            metrics.gc = collectGcMetrics();
+        }
+        
+        // Coleta exceções capturadas
+        if (config.isExceptionCaptureEnabled()) {
+            collectExceptions(metrics);
+        }
+        
+        // Coleta queries SQL capturadas
+        if (config.isSqlCaptureEnabled()) {
+            collectSqlQueries(metrics);
+            // Agregados
+            metrics.sql.addAll(SqlAggregationRegistry.get().drainAggregated(config));
+        }
+
+        // Snapshot de CPU profiling
+        if (config.isCpuProfilingEnabled()) {
+            try {
+                agent.profiling.CpuSamplingProfiler profiler = AgentMain.getCpuProfiler();
+                if (profiler != null) {
+                    metrics.cpuProfile = profiler.buildAndResetSnapshot();
+                }
+            } catch (Exception e) {
+                System.err.println("AVISO: Falha ao coletar snapshot CPU: " + e.getMessage());
+            }
+        }
+
+        // I/O metrics
+        if (config.isFileIoEnabled() || config.isSocketIoEnabled()) {
+            metrics.io = collectIoMetrics();
+        }
+
+            // Coleta spans de tracing
+            if (config.isTracingEnabled()) {
+                TracingManager.get().injectCollected(metrics);
+            }
+        
+        // Coleta métricas de connection pools
+        collectConnectionPoolMetrics(metrics);
 
         return metrics;
     }
@@ -88,19 +138,68 @@ public class MetricsCollector {
 
         // Classifica threads por estado
         long[] allThreadIds = threadMXBean.getAllThreadIds();
-        ThreadInfo[] threadInfos = threadMXBean.getThreadInfo(allThreadIds);
+        ThreadInfo[] threadInfos;
+        
+        // Se análise de stack está habilitada, obtém stack traces completos
+        if (config.isThreadStackAnalysisEnabled()) {
+            int maxDepth = config.getThreadStackMaxDepth();
+            threadInfos = threadMXBean.getThreadInfo(allThreadIds, maxDepth);
+        } else {
+            threadInfos = threadMXBean.getThreadInfo(allThreadIds);
+        }
+        
+        // Contadores e listas para cada estado
+        int runnableCount = 0, blockedCount = 0, waitingCount = 0, timedWaitingCount = 0;
+        int sampleSize = config.getThreadStackSampleSize();
         
         for (ThreadInfo info : threadInfos) {
             if (info != null) {
-                switch (info.getThreadState()) {
-                    case RUNNABLE: stats.runnable++; break;
-                    case BLOCKED: stats.blocked++; break;
-                    case WAITING: stats.waiting++; break;
-                    case TIMED_WAITING: stats.timed_waiting++; break;
+                Thread.State state = info.getThreadState();
+                
+                switch (state) {
+                    case RUNNABLE: 
+                        stats.runnable++; 
+                        if (config.isThreadStackAnalysisEnabled() && runnableCount < sampleSize) {
+                            stats.runnableDetails.add(createThreadStackInfo(info));
+                            runnableCount++;
+                        }
+                        break;
+                    case BLOCKED: 
+                        stats.blocked++; 
+                        if (config.isThreadStackAnalysisEnabled() && blockedCount < sampleSize) {
+                            stats.blockedDetails.add(createThreadStackInfo(info));
+                            blockedCount++;
+                        }
+                        break;
+                    case WAITING: 
+                        stats.waiting++; 
+                        if (config.isThreadStackAnalysisEnabled() && waitingCount < sampleSize) {
+                            stats.waitingDetails.add(createThreadStackInfo(info));
+                            waitingCount++;
+                        }
+                        break;
+                    case TIMED_WAITING: 
+                        stats.timed_waiting++; 
+                        if (config.isThreadStackAnalysisEnabled() && timedWaitingCount < sampleSize) {
+                            stats.timedWaitingDetails.add(createThreadStackInfo(info));
+                            timedWaitingCount++;
+                        }
+                        break;
                     default: break;
                 }
             }
         }
+        
+        // Coleta detalhes de threads em deadlock se habilitado
+        if (config.isThreadStackAnalysisEnabled() && deadlockedThreads != null) {
+            ThreadInfo[] deadlockedInfos = threadMXBean.getThreadInfo(deadlockedThreads, config.getThreadStackMaxDepth());
+            for (ThreadInfo info : deadlockedInfos) {
+                if (info != null && stats.deadlockedDetails.size() < sampleSize) {
+                    stats.deadlockedDetails.add(createThreadStackInfo(info));
+                }
+            }
+        }
+        
         return stats;
     }
 
@@ -125,5 +224,107 @@ public class MetricsCollector {
         mem.total = memory.getTotal();
         mem.free = memory.getAvailable();
         return mem;
+    }
+
+    private GcMetrics collectGcMetrics() {
+        GcMetrics gc = new GcMetrics();
+        gc.name = "Combined"; // Agregado de todos os GCs
+        
+        // Obtém beans de Garbage Collection
+        for (GarbageCollectorMXBean gcBean : ManagementFactory.getGarbageCollectorMXBeans()) {
+            gc.collectionCount += gcBean.getCollectionCount();
+            gc.collectionTimeMs += gcBean.getCollectionTime();
+        }
+        
+        return gc;
+    }
+    
+    private void collectExceptions(AgentMetrics metrics) {
+        try {
+            // Obtém ExceptionHandler do AgentMain
+            ExceptionHandler exceptionHandler = AgentMain.getExceptionHandler();
+            if (exceptionHandler != null) {
+                java.util.List<agent.models.ExceptionInfo> drained = exceptionHandler.drainExceptions();
+                if (drained.isEmpty()) {
+                    // Debug opcional
+                    // System.out.println("DEBUG: Nenhuma exceção capturada neste intervalo.");
+                }
+                metrics.exceptions.addAll(drained);
+            }
+        } catch (Exception e) {
+            System.err.println("AVISO: Erro ao coletar exceções: " + e.getMessage());
+        }
+    }
+    
+    private void collectSqlQueries(AgentMetrics metrics) {
+        try {
+            // Obtém queries do SqlRegistry
+            java.util.List<agent.models.SqlQueryInfo> drained = SqlRegistry.getInstance().drainQueries();
+            if (drained.isEmpty()) {
+                // System.out.println("DEBUG: Nenhuma query SQL capturada neste intervalo.");
+            }
+            metrics.sql.addAll(drained);
+        } catch (Exception e) {
+            System.err.println("AVISO: Erro ao coletar queries SQL: " + e.getMessage());
+        }
+    }
+    
+    private void collectConnectionPoolMetrics(AgentMetrics metrics) {
+        try {
+            metrics.connectionPools.addAll(poolMonitor.collectAllPoolMetrics());
+        } catch (Exception e) {
+            System.err.println("AVISO: Erro ao coletar métricas de connection pool: " + e.getMessage());
+        }
+    }
+    
+    private ThreadStackInfo createThreadStackInfo(ThreadInfo threadInfo) {
+        ThreadStackInfo stackInfo = new ThreadStackInfo();
+        
+        stackInfo.threadId = threadInfo.getThreadId();
+        stackInfo.threadName = threadInfo.getThreadName();
+        stackInfo.threadState = threadInfo.getThreadState().toString();
+        stackInfo.blockedTime = threadInfo.getBlockedTime();
+        stackInfo.waitedTime = threadInfo.getWaitedTime();
+        stackInfo.inNative = threadInfo.isInNative();
+        stackInfo.suspended = threadInfo.isSuspended();
+        stackInfo.timestamp = java.time.Instant.now().toString();
+        
+        // Informações de lock
+        if (threadInfo.getLockName() != null) {
+            stackInfo.lockName = threadInfo.getLockName();
+        }
+        if (threadInfo.getLockOwnerName() != null) {
+            stackInfo.lockOwner = threadInfo.getLockOwnerName();
+        }
+        
+        // Captura stack trace
+        StackTraceElement[] stackTrace = threadInfo.getStackTrace();
+        stackInfo.stackTrace = new java.util.ArrayList<>();
+        
+        if (stackTrace != null) {
+            for (StackTraceElement element : stackTrace) {
+                stackInfo.stackTrace.add(element.toString());
+            }
+        }
+        
+        return stackInfo;
+    }
+
+    private IoMetrics collectIoMetrics() {
+        IoMetrics io = new IoMetrics();
+        int limit = config.getIoMaxTopEntries();
+        long[] totals = new long[2];
+        if (config.isFileIoEnabled()) {
+            io.topFiles = IoFileTracker.get().top(limit, totals);
+            io.totalFileReadBytes = totals[0];
+            io.totalFileWriteBytes = totals[1];
+        }
+        totals = new long[2];
+        if (config.isSocketIoEnabled()) {
+            io.topSockets = IoSocketTracker.get().top(limit, totals);
+            io.totalSocketReadBytes = totals[0];
+            io.totalSocketWriteBytes = totals[1];
+        }
+        return io;
     }
 }

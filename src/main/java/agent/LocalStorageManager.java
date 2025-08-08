@@ -24,8 +24,13 @@ public class LocalStorageManager {
     public LocalStorageManager(ConfigLoader config) {
         this.config = config;
         String configPath = config.getLocalStoragePath();
-        this.storagePath = Paths.get(configPath.isEmpty() ? 
-            System.getProperty("java.io.tmpdir") + "/javaagent-diagnostico" : configPath);
+        
+        // Se o path está vazio ou é null, usa o diretório temporário
+        if (configPath == null || configPath.trim().isEmpty()) {
+            configPath = System.getProperty("java.io.tmpdir") + "/javaagent-diagnostico";
+        }
+        
+        this.storagePath = Paths.get(configPath);
         
         try {
             Files.createDirectories(storagePath);
@@ -43,6 +48,7 @@ public class LocalStorageManager {
      */
     public boolean store(AgentMetrics metrics) {
         if (!config.isLocalStorageEnabled()) {
+            System.out.println("AVISO: Armazenamento local está desabilitado. Dados não foram salvos localmente.");
             return false;
         }
         

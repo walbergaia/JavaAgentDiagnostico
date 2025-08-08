@@ -32,19 +32,31 @@ public class ExceptionHandler {
 
         System.out.println("Configurando handler global de exceções.");
         Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
-            System.err.println("AGENTE: Exceção não tratada capturada na thread: " + thread.getName());
-            
-            ExceptionInfo info = new ExceptionInfo();
-            info.timestamp = Instant.now().toString();
-            info.threadName = thread.getName();
-            info.type = throwable.getClass().getName();
-            info.message = throwable.getMessage();
-            info.stackTrace = getStackTraceAsString(throwable, config.isDeepStackAnalysisEnabled());
+            try {
+                System.err.println("AGENTE: Exceção não tratada capturada na thread: " + thread.getName());
+                
+                ExceptionInfo info = new ExceptionInfo();
+                info.timestamp = Instant.now().toString();
+                info.threadName = thread.getName();
+                info.type = throwable.getClass().getSimpleName(); // Nome mais limpo
+                info.message = throwable.getMessage() != null ? throwable.getMessage() : "No message";
+                info.stackTrace = getStackTraceAsString(throwable, config.isDeepStackAnalysisEnabled());
 
-            capturedExceptions.add(info);
+                capturedExceptions.add(info);
+                
+                // Log resumo para debugging
+                System.err.println("EXCEPTION CAPTURED: " + info.type + " in " + thread.getName() + 
+                    " - " + (info.message.length() > 50 ? info.message.substring(0, 50) + "..." : info.message));
 
-            // Opcional: imprimir o stack trace no console para manter o comportamento padrão.
-            throwable.printStackTrace();
+                // Opcional: imprimir o stack trace completo no console para manter o comportamento padrão.
+                if (config.isDeepStackAnalysisEnabled()) {
+                    throwable.printStackTrace();
+                }
+                
+            } catch (Exception e) {
+                // Falha no handler de exceção não deve quebrar a aplicação
+                System.err.println("AVISO: Erro no handler de exceções: " + e.getMessage());
+            }
         });
     }
 

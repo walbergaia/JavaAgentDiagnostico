@@ -15,7 +15,12 @@ public class AgentMetrics {
     public CpuMetrics cpu;
     public MemoryMetrics memory;
     public ThreadStats threads;
+    public GcMetrics gc;
     // Usamos listas thread-safe para que possam ser preenchidas por diferentes partes do agente.
     public final List<ExceptionInfo> exceptions = new CopyOnWriteArrayList<>();
     public final List<SqlQueryInfo> sql = new CopyOnWriteArrayList<>();
+    public final List<ConnectionPoolMetrics> connectionPools = new CopyOnWriteArrayList<>();
+    public final List<TraceSpan> spans = new CopyOnWriteArrayList<>();
+    public CpuProfileSnapshot cpuProfile; // snapshot opcional de CPU sampling
+    public IoMetrics io; // métricas de I/O
 }

@@ -39,14 +39,24 @@ public class RestClient {
      */
     public void send(AgentMetrics metrics) {
         if (!config.isRestSendEnabled()) {
-            return; // Envio desabilitado
+            // Se REST está desabilitado, mas storage local está habilitado, armazena localmente
+            if (config.isLocalStorageEnabled()) {
+                boolean stored = storageManager.store(metrics);
+                if (!stored) {
+                    System.err.println("ERRO: Falha ao armazenar dados localmente com REST desabilitado");
+                }
+            }
+            return;
         }
 
         // Adiciona à fila para processamento assíncrono
         if (!dataQueue.enqueue(metrics)) {
-            // Se fila cheia, tenta armazenar localmente
-            if (config.isLocalStorageEnabled()) {
-                storageManager.store(metrics);
+            // Se fila cheia, tenta armazenar localmente como fallback
+            System.out.println("Fila cheia - tentando armazenar diretamente no storage local");
+            boolean stored = storageManager.store(metrics);
+            
+            if (!stored) {
+                System.err.println("ERRO: Dados perdidos - fila cheia E falha no armazenamento local");
             }
         }
     }
@@ -211,9 +221,15 @@ public class RestClient {
                             boolean success = sendHttp(item.metrics);
                             
                             if (!success) {
-                                // Se falhar e overflow deve ir para storage
-                                if (dataQueue.shouldOverflowToStorage() || !dataQueue.enqueue(item.metrics, DataQueue.QueueItem.Priority.LOW, "retry")) {
-                                    storageManager.store(item.metrics);
+                                // Se falhar no envio, tenta armazenar localmente
+                                System.out.println("Falha no envio - armazenando localmente como fallback");
+                                boolean storedLocally = storageManager.store(item.metrics);
+                                
+                                if (!storedLocally) {
+                                    // Se não conseguir armazenar localmente, tenta recolocar na fila
+                                    if (!dataQueue.enqueue(item.metrics, DataQueue.QueueItem.Priority.LOW, "retry")) {
+                                        System.err.println("ERRO: Dados perdidos - falha no envio E no armazenamento local E fila cheia");
+                                    }
                                 }
                             }
                         } else {

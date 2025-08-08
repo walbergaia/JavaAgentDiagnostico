@@ -1,0 +1,71 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '5.2.0'
+}
+
+group = 'com.github.walbergaia'
+version = '1.0.0-SNAPSHOT'
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Byte Buddy para instrumentação de código em tempo de execução (versão compatível com Java 8 antigo)
+    implementation 'net.bytebuddy:byte-buddy:1.12.23'
+    implementation 'net.bytebuddy:byte-buddy-agent:1.12.23'
+    
+    // Gson para serialização/deserialização de JSON (versão compatível)
+    implementation 'com.google.code.gson:gson:2.8.9'
+    
+    // OSHI para métricas de sistema operacional (versão mais antiga e compatível)
+    implementation 'com.github.oshi:oshi-core:5.8.5'
+
+    // Servlet API somente em tempo de compilação (container fornece em runtime)
+    compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
+}
+
+// Configuração do Shadow JAR para criar um fat JAR com todas as dependências
+shadowJar {
+    classifier = ''
+    
+    manifest {
+        attributes(
+            'Premain-Class': 'agent.AgentMain',
+            'Can-Redefine-Classes': 'true',
+            'Can-Retransform-Classes': 'true'
+        )
+    }
+    
+    // Remove arquivos desnecessários
+    exclude 'META-INF/*.SF'
+    exclude 'META-INF/*.DSA'
+    exclude 'META-INF/*.RSA'
+}
+
+// Configuração para usar UTF-8 na compilação
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+// Define shadowJar como a task padrão de build
+build.dependsOn shadowJar
+
+// Task customizada para facilitar a execução
+task runAgent(type: JavaExec) {
+    description = 'Executa uma aplicação de teste com o agente'
+    group = 'application'
+    
+    dependsOn shadowJar
+    
+    main = 'TestApp'
+    classpath = sourceSets.main.runtimeClasspath
+    jvmArgs = ["-javaagent:${shadowJar.archivePath}"]
+    
+    doFirst {
+        println "Executando com agente: ${shadowJar.archivePath}"
+    }
+}

@@ -1,0 +1,53 @@
+# Configurações do Agente de Diagnóstico
+
+# Habilita ou desabilita o agente completamente
+enabled=true
+
+# Nome lógico do agente para identificação no backend
+agent.name=diagnostic-agent-1
+
+# Nome da aplicação que está sendo monitorada
+application.name=MinhaApp.jar
+
+# Intervalo em milissegundos para a coleta de métricas periódicas
+sampling.interval.ms=30000
+
+# Configurações do envio de dados para a API REST
+send.rest.enabled=true
+rest.endpoint.url=http://localhost:8080/api/v1/metrics
+# Token de autenticação para a API (opcional)
+# auth.token=SEU_TOKEN_AQUI
+
+# Configurações REST avançadas
+rest.timeout.ms=5000
+rest.retry.max.attempts=3
+rest.retry.backoff.initial.ms=1000
+# Autenticação personalizada via headers (opcional)
+# rest.auth.header.name=Authorization
+# rest.auth.header.value=Bearer your-token-here
+
+# Configurações de armazenamento local para backup
+local.storage.enabled=true
+local.storage.path=
+local.storage.max.files=1000
+local.storage.cleanup.hours=24
+
+# Configurações da fila de dados em memória
+data.queue.max.size=10000
+
+# Módulos de captura de dados
+enable.exception.capture=true
+enable.sql.capture=true
+enable.gc.metrics=true
+enable.system.cpu.mem=true
+enable.io.metrics=false # Desativado por padrão por ser mais pesado
+
+# Configurações de detalhamento e thresholds
+sql.slow.threshold.ms=1000
+enable.deep.stack.analysis=false # Desativado por padrão para menor overhead
+
+# Servidor de configuração dinâmica
+config.server.enabled=false
+config.server.port=8090
+config.server.auth.token=
+config.server.bind.address=localhost

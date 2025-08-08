@@ -47,13 +47,27 @@ O agente é anexado à JVM durante a inicialização e opera em segundo plano, c
 
 ## 🛠️ Como Construir
 
-O projeto utiliza o Maven. Para construir o agente e empacotar todas as dependências em um único arquivo JAR, execute o seguinte comando na raiz do projeto:
+O projeto utiliza o Gradle. Para construir o agente e empacotar todas as dependências em um único arquivo JAR, execute um dos seguintes comandos:
 
-```bash
-mvn clean package
+### Windows:
+```batch
+.\gradlew build
+```
+ou execute o script de conveniência:
+```batch
+build.bat
 ```
 
-O artefato final, `JavaAgentDiagnostico-1.0-SNAPSHOT-jar-with-dependencies.jar`, será gerado no diretório `target/`.
+### Linux/macOS:
+```bash
+./gradlew build
+```
+ou execute o script de conveniência:
+```bash
+./build.sh
+```
+
+O artefato final, `JavaAgentDiagnostico-1.0.0-SNAPSHOT.jar`, será gerado no diretório `build/libs/`.
 
 ---
 
@@ -61,13 +75,20 @@ O artefato final, `JavaAgentDiagnostico-1.0-SNAPSHOT-jar-with-dependencies.jar`,
 
 Para monitorar sua aplicação, anexe o agente durante a inicialização usando a flag `-javaagent`.
 
-1.  **Renomeie** o JAR gerado para `diagnostic-agent.jar` (ou o nome que preferir).
-2.  **Coloque** o `diagnostic-agent.jar` e o arquivo `agent.properties` no mesmo diretório da sua aplicação.
+1.  **Use** o JAR gerado em `build/libs/JavaAgentDiagnostico-1.0.0-SNAPSHOT.jar` (ou renomeie conforme preferir).
+2.  **Coloque** o arquivo `agent.properties` no mesmo diretório da sua aplicação.
 3.  **Inicie** sua aplicação com a flag:
 
 ```bash
-java -javaagent:diagnostic-agent.jar -jar sua-aplicacao.jar
+java -javaagent:build/libs/JavaAgentDiagnostico-1.0.0-SNAPSHOT.jar -jar sua-aplicacao.jar
 ```
+
+### Comandos Gradle Úteis:
+
+- `.\gradlew build` - Compila e gera o JAR com todas as dependências
+- `.\gradlew clean` - Limpa arquivos de build anteriores
+- `.\gradlew shadowJar` - Gera apenas o fat JAR (sem executar testes)
+- `.\gradlew tasks` - Lista todas as tasks disponíveis
 
 O agente será carregado automaticamente e começará a enviar dados com base nas configurações do `agent.properties`.
 
