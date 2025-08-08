@@ -19,6 +19,7 @@ dependency-reduced-pom.xml
 *.iws
 *.iml
 *.ipr
+*.class
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
