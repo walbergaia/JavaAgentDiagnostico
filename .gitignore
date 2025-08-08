@@ -63,3 +63,10 @@ Thumbs.db
 *.pid
 agent-data/
 logs/
+storage/
+
+# Test files created during development
+TestSqlAgent.java
+MinimalSqlTest.java
+TestSqlAgent.class
+MinimalSqlTest.class
