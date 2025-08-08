@@ -1,22 +1,49 @@
-# Maven build artifacts
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Maven build artifacts (mantido para compatibilidade)
 target/
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
 pom.xml.next
 release.properties
+dependency-reduced-pom.xml
 
-# IDE files
+# IntelliJ IDEA
 .idea/
+*.iws
 *.iml
-.vscode/
-.settings/
-.project
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+# Eclipse
+.apt_generated
 .classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+# VS Code
+.vscode/
 
 # OS files
 .DS_Store
 Thumbs.db
+
+# Java bytecode
+*.class
 
 # Logs
 *.log
@@ -26,9 +53,13 @@ Thumbs.db
 *.temp
 *~
 
-# Java bytecode
-*.class
-
-# JAR files (unless they are libraries)
+# JAR files (keep only specific build artifacts)
 *.jar
+!gradle/wrapper/gradle-wrapper.jar
 !lib/*.jar
+!build/libs/JavaAgentDiagnostico*.jar
+
+# Application specific
+*.pid
+agent-data/
+logs/
