@@ -1,0 +1,372 @@
+{
+  "timestamp": "2025-08-08T14:16:36.645514615Z",
+  "agentName": "diagnostic-agent-1",
+  "application": "MinhaApp.jar",
+  "hostname": "pkrvmjbmru5nbw0",
+  "ip": "10.1.0.39",
+  "uptime": 30350,
+  "heap": {
+    "used": 56304048,
+    "max": 4194304000,
+    "committed": 266338304
+  },
+  "cpu": {
+    "process": 1.1904296875,
+    "system": 0.2756095531330615
+  },
+  "memory": {
+    "total": 16772571136,
+    "free": 14673166336
+  },
+  "threads": {
+    "total": 11,
+    "runnable": 5,
+    "blocked": 0,
+    "waiting": 2,
+    "timed_waiting": 4,
+    "deadlocks": 0,
+    "runnableDetails": [
+      {
+        "threadId": 2,
+        "threadName": "Reference Handler",
+        "threadState": "RUNNABLE",
+        "blockedTime": -1,
+        "waitedTime": -1,
+        "inNative": false,
+        "suspended": false,
+        "stackTrace": [
+          "java.base@17.0.16/java.lang.ref.Reference.waitForReferencePendingList(Native Method)",
+          "java.base@17.0.16/java.lang.ref.Reference.processPendingReferences(Reference.java:253)",
+          "java.base@17.0.16/java.lang.ref.Reference$ReferenceHandler.run(Reference.java:215)"
+        ],
+        "timestamp": "2025-08-08T14:16:36.646202313Z"
+      },
+      {
+        "threadId": 4,
+        "threadName": "Signal Dispatcher",
+        "threadState": "RUNNABLE",
+        "blockedTime": -1,
+        "waitedTime": -1,
+        "inNative": false,
+        "suspended": false,
+        "stackTrace": [],
+        "timestamp": "2025-08-08T14:16:36.646259470Z"
+      },
+      {
+        "threadId": 16,
+        "threadName": "JavaAgent-MetricsScheduler",
+        "threadState": "RUNNABLE",
+        "blockedTime": -1,
+        "waitedTime": -1,
+        "inNative": false,
+        "suspended": false,
+        "stackTrace": [
+          "java.management@17.0.16/sun.management.ThreadImpl.getThreadInfo1(Native Method)",
+          "java.management@17.0.16/sun.management.ThreadImpl.getThreadInfo(ThreadImpl.java:197)",
+          "app//agent.MetricsCollector.collectThreadMetrics(MetricsCollector.java:146)",
+          "app//agent.MetricsCollector.collect(MetricsCollector.java:71)",
+          "app//agent.MetricsScheduler.lambda$start$1(MetricsScheduler.java:40)",
+          "app//agent.MetricsScheduler$$Lambda$116/0x00007f596808e220.run(Unknown Source)",
+          "java.base@17.0.16/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)",
+          "java.base@17.0.16/java.util.concurrent.FutureTask.runAndReset(FutureTask.java:305)",
+          "java.base@17.0.16/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:305)",
+          "java.base@17.0.16/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)",
+          "java.base@17.0.16/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)",
+          "java.base@17.0.16/java.lang.Thread.run(Thread.java:840)"
+        ],
+        "timestamp": "2025-08-08T14:16:36.646412757Z"
+      },
+      {
+        "threadId": 19,
+        "threadName": "Notification Thread",
+        "threadState": "RUNNABLE",
+        "blockedTime": -1,
+        "waitedTime": -1,
+        "inNative": false,
+        "suspended": false,
+        "stackTrace": [],
+        "timestamp": "2025-08-08T14:16:36.646485182Z"
+      },
+      {
+        "threadId": 20,
+        "threadName": "DestroyJavaVM",
+        "threadState": "RUNNABLE",
+        "blockedTime": -1,
+        "waitedTime": -1,
+        "inNative": false,
+        "suspended": false,
+        "stackTrace": [],
+        "timestamp": "2025-08-08T14:16:36.646505771Z"
+      }
+    ],
+    "blockedDetails": [],
+    "waitingDetails": [
+      {
+        "threadId": 3,
+        "threadName": "Finalizer",
+        "threadState": "WAITING",
+        "lockName": "java.lang.ref.ReferenceQueue$Lock@4c2a4ac3",
+        "blockedTime": -1,
+        "waitedTime": -1,
+        "inNative": false,
+        "suspended": false,
+        "stackTrace": [
+          "java.base@17.0.16/java.lang.Object.wait(Native Method)",
+          "java.base@17.0.16/java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:155)",
+          "java.base@17.0.16/java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:176)",
+          "java.base@17.0.16/java.lang.ref.Finalizer$FinalizerThread.run(Finalizer.java:172)"
+        ],
+        "timestamp": "2025-08-08T14:16:36.646236296Z"
+      },
+      {
+        "threadId": 14,
+        "threadName": "JNA Cleaner",
+        "threadState": "WAITING",
+        "lockName": "java.lang.ref.ReferenceQueue$Lock@68041a18",
+        "blockedTime": -1,
+        "waitedTime": -1,
+        "inNative": false,
+        "suspended": false,
+        "stackTrace": [
+          "java.base@17.0.16/java.lang.Object.wait(Native Method)",
+          "java.base@17.0.16/java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:155)",
+          "java.base@17.0.16/java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:176)",
+          "app//com.sun.jna.internal.Cleaner$1.run(Cleaner.java:58)"
+        ],
+        "timestamp": "2025-08-08T14:16:36.646352795Z"
+      }
+    ],
+    "timedWaitingDetails": [
+      {
+        "threadId": 11,
+        "threadName": "Common-Cleaner",
+        "threadState": "TIMED_WAITING",
+        "lockName": "java.lang.ref.ReferenceQueue$Lock@6ffb13b1",
+        "blockedTime": -1,
+        "waitedTime": -1,
+        "inNative": false,
+        "suspended": false,
+        "stackTrace": [
+          "java.base@17.0.16/java.lang.Object.wait(Native Method)",
+          "java.base@17.0.16/java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:155)",
+          "java.base@17.0.16/jdk.internal.ref.CleanerImpl.run(CleanerImpl.java:140)",
+          "java.base@17.0.16/java.lang.Thread.run(Thread.java:840)",
+          "java.base@17.0.16/jdk.internal.misc.InnocuousThread.run(InnocuousThread.java:162)"
+        ],
+        "timestamp": "2025-08-08T14:16:36.646275179Z"
+      },
+      {
+        "threadId": 13,
+        "threadName": "process reaper",
+        "threadState": "TIMED_WAITING",
+        "lockName": "java.util.concurrent.SynchronousQueue$TransferStack@2f015f90",
+        "blockedTime": -1,
+        "waitedTime": -1,
+        "inNative": false,
+        "suspended": false,
+        "stackTrace": [
+          "java.base@17.0.16/jdk.internal.misc.Unsafe.park(Native Method)",
+          "java.base@17.0.16/java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:252)",
+          "java.base@17.0.16/java.util.concurrent.SynchronousQueue$TransferStack.transfer(SynchronousQueue.java:401)",
+          "java.base@17.0.16/java.util.concurrent.SynchronousQueue.poll(SynchronousQueue.java:903)",
+          "java.base@17.0.16/java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1061)",
+          "java.base@17.0.16/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1122)",
+          "java.base@17.0.16/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)",
+          "java.base@17.0.16/java.lang.Thread.run(Thread.java:840)"
+        ],
+        "timestamp": "2025-08-08T14:16:36.646315725Z"
+      },
+      {
+        "threadId": 15,
+        "threadName": "RestClient-Processor",
+        "threadState": "TIMED_WAITING",
+        "lockName": "java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject@76662989",
+        "blockedTime": -1,
+        "waitedTime": -1,
+        "inNative": false,
+        "suspended": false,
+        "stackTrace": [
+          "java.base@17.0.16/jdk.internal.misc.Unsafe.park(Native Method)",
+          "java.base@17.0.16/java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:252)",
+          "java.base@17.0.16/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:1679)",
+          "java.base@17.0.16/java.util.concurrent.PriorityBlockingQueue.poll(PriorityBlockingQueue.java:549)",
+          "app//agent.DataQueue.dequeueWithTimeout(DataQueue.java:141)",
+          "app//agent.RestClient.lambda$startBackgroundProcessor$0(RestClient.java:217)",
+          "app//agent.RestClient$$Lambda$114/0x00007f5968087ca8.run(Unknown Source)",
+          "java.base@17.0.16/java.lang.Thread.run(Thread.java:840)"
+        ],
+        "timestamp": "2025-08-08T14:16:36.646379424Z"
+      },
+      {
+        "threadId": 17,
+        "threadName": "JavaAgent-CPU-Sampler",
+        "threadState": "TIMED_WAITING",
+        "blockedTime": -1,
+        "waitedTime": -1,
+        "inNative": false,
+        "suspended": false,
+        "stackTrace": [
+          "java.base@17.0.16/java.lang.Thread.sleep(Native Method)",
+          "app//agent.profiling.CpuSamplingProfiler.loop(CpuSamplingProfiler.java:68)",
+          "app//agent.profiling.CpuSamplingProfiler$$Lambda$158/0x00007f59681ca6b0.run(Unknown Source)",
+          "java.base@17.0.16/java.lang.Thread.run(Thread.java:840)"
+        ],
+        "timestamp": "2025-08-08T14:16:36.646455718Z"
+      }
+    ],
+    "deadlockedDetails": []
+  },
+  "gc": {
+    "name": "Combined",
+    "collectionCount": 2,
+    "collectionTimeMs": 7
+  },
+  "exceptions": [
+    {
+      "timestamp": "2025-08-08T14:16:07.482880434Z",
+      "type": "SQLException",
+      "message": "No suitable driver found for jdbc:h2:mem:test",
+      "stackTrace": "java.sql.SQLException: No suitable driver found for jdbc:h2:mem:test\n\tat java.sql/java.sql.DriverManager.getConnection(DriverManager.java:706)\n\tat java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)\n\tat MinimalSqlTest.main(MinimalSqlTest.java:7)\n",
+      "threadName": "main"
+    }
+  ],
+  "sql": [],
+  "connectionPools": [],
+  "spans": [],
+  "cpuProfile": {
+    "timestamp": "2025-08-08T14:16:36.647562080Z",
+    "totalSamples": 1169,
+    "uniqueFrames": 53,
+    "discardedSamples": 0,
+    "top": [
+      {
+        "symbol": "java.lang.Thread.run:840",
+        "samples": 730,
+        "selfSamples": 0,
+        "pct": 62.446535500427714
+      },
+      {
+        "symbol": "java.lang.ref.ReferenceQueue.remove:155",
+        "samples": 438,
+        "selfSamples": 0,
+        "pct": 37.46792130025663
+      },
+      {
+        "symbol": "java.lang.Object.wait:-2",
+        "samples": 438,
+        "selfSamples": 438,
+        "pct": 37.46792130025663
+      },
+      {
+        "symbol": "jdk.internal.misc.Unsafe.park:-2",
+        "samples": 438,
+        "selfSamples": 438,
+        "pct": 37.46792130025663
+      },
+      {
+        "symbol": "java.util.concurrent.locks.LockSupport.parkNanos:252",
+        "samples": 438,
+        "selfSamples": 0,
+        "pct": 37.46792130025663
+      },
+      {
+        "symbol": "java.util.concurrent.ThreadPoolExecutor$Worker.run:635",
+        "samples": 292,
+        "selfSamples": 0,
+        "pct": 24.978614200171087
+      },
+      {
+        "symbol": "java.lang.ref.ReferenceQueue.remove:176",
+        "samples": 292,
+        "selfSamples": 0,
+        "pct": 24.978614200171087
+      },
+      {
+        "symbol": "java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos:1679",
+        "samples": 292,
+        "selfSamples": 0,
+        "pct": 24.978614200171087
+      },
+      {
+        "symbol": "java.util.concurrent.ThreadPoolExecutor.runWorker:1122",
+        "samples": 292,
+        "selfSamples": 0,
+        "pct": 24.978614200171087
+      },
+      {
+        "symbol": "java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take:1182",
+        "samples": 146,
+        "selfSamples": 0,
+        "pct": 12.489307100085544
+      },
+      {
+        "symbol": "agent.RestClient$$Lambda$114/0x00007f5968087ca8.run:-1",
+        "samples": 146,
+        "selfSamples": 0,
+        "pct": 12.489307100085544
+      },
+      {
+        "symbol": "java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take:899",
+        "samples": 146,
+        "selfSamples": 0,
+        "pct": 12.489307100085544
+      },
+      {
+        "symbol": "java.lang.ref.Reference.waitForReferencePendingList:-2",
+        "samples": 146,
+        "selfSamples": 146,
+        "pct": 12.489307100085544
+      },
+      {
+        "symbol": "jdk.internal.misc.InnocuousThread.run:162",
+        "samples": 146,
+        "selfSamples": 0,
+        "pct": 12.489307100085544
+      },
+      {
+        "symbol": "jdk.internal.ref.CleanerImpl.run:140",
+        "samples": 146,
+        "selfSamples": 0,
+        "pct": 12.489307100085544
+      },
+      {
+        "symbol": "agent.profiling.CpuSamplingProfiler.loop:53",
+        "samples": 146,
+        "selfSamples": 0,
+        "pct": 12.489307100085544
+      },
+      {
+        "symbol": "com.sun.jna.internal.Cleaner$1.run:58",
+        "samples": 146,
+        "selfSamples": 0,
+        "pct": 12.489307100085544
+      },
+      {
+        "symbol": "java.util.concurrent.PriorityBlockingQueue.poll:549",
+        "samples": 146,
+        "selfSamples": 0,
+        "pct": 12.489307100085544
+      },
+      {
+        "symbol": "java.lang.ref.Reference$ReferenceHandler.run:215",
+        "samples": 146,
+        "selfSamples": 0,
+        "pct": 12.489307100085544
+      },
+      {
+        "symbol": "java.util.concurrent.SynchronousQueue.poll:903",
+        "samples": 146,
+        "selfSamples": 0,
+        "pct": 12.489307100085544
+      }
+    ]
+  },
+  "io": {
+    "totalFileReadBytes": 0,
+    "totalFileWriteBytes": 0,
+    "totalSocketReadBytes": 0,
+    "totalSocketWriteBytes": 0,
+    "topFiles": [],
+    "topSockets": []
+  }
+}

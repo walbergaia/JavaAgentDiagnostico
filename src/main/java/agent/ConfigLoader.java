@@ -224,6 +224,9 @@ public class ConfigLoader {
     public String getHttpCaptureRequestHeaders() { return getProperty("tracing.http.capture.request.headers", ""); }
     public String getHttpCaptureResponseHeaders() { return getProperty("tracing.http.capture.response.headers", ""); }
     
+    // --- SQL Debug Configuration ---
+    public boolean isSqlDebugEnabled() { return getBooleanProperty("sql.debug.enabled", false); }
+    
     public void logConfigSources() {
         try {
             System.out.println("-- Fontes agent.properties no classpath --");

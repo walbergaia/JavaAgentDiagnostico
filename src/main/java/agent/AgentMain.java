@@ -2,7 +2,7 @@ package agent;
 
 import agent.config.ConfigurationServer;
 import agent.tracing.TracingManager;
-import agent.instrumentation.HttpServletInstrumentation;
+// import agent.instrumentation.HttpServletInstrumentation; // Temporarily commented out due to missing servlet dependencies
 import agent.instrumentation.HttpClientInstrumentation;
 import agent.profiling.CpuSamplingProfiler;
 import agent.instrumentation.FileIoInstrumentation;
@@ -82,7 +82,7 @@ public class AgentMain {
             if (config.isTracingEnabled()) {
                 TracingManager.get().init(config);
                 if (config.isHttpTracingEnabled()) {
-                    HttpServletInstrumentation.setup(inst, config);
+                    // HttpServletInstrumentation.setup(inst, config); // Temporarily commented out
                 }
                 // Instrumentação cliente HTTP
                 HttpClientInstrumentation.setup(inst, config);
