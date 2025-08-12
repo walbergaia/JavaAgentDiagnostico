@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Armazena dados em arquivos JSON na pasta temporária configurada.
  */
 public class LocalStorageManager {
+    private static volatile LocalStorageManager INSTANCE;
     
     private final ConfigLoader config;
     private final Path storagePath;
@@ -39,6 +40,20 @@ public class LocalStorageManager {
             System.err.println("ERRO: Falha ao criar diretório de armazenamento: " + storagePath);
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Inicializa singleton preguiçoso.
+     */
+    public static LocalStorageManager getInstance() {
+        if (INSTANCE == null) {
+            synchronized (LocalStorageManager.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new LocalStorageManager(ConfigLoader.getInstance());
+                }
+            }
+        }
+        return INSTANCE;
     }
     
     /**
@@ -70,6 +85,25 @@ public class LocalStorageManager {
             return true;
         } catch (IOException e) {
             System.err.println("ERRO: Falha ao armazenar dados localmente: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Método simplificado para salvar dados arbitrários (ex: relatório de métricas SQL).
+     */
+    public boolean saveData(String prefix, String content) {
+        if (!config.isLocalStorageEnabled()) return false;
+        try {
+            String timestamp = LocalDateTime.now().format(fileNameFormatter);
+            String fileName = prefix + "_" + timestamp + ".txt";
+            Path filePath = storagePath.resolve(fileName);
+            Files.write(filePath, content.getBytes("UTF-8"));
+            fileCreationTimes.put(fileName, System.currentTimeMillis());
+            cleanupOldFiles();
+            return true;
+        } catch (IOException e) {
+            System.err.println("ERRO: Falha ao salvar dados genéricos: " + e.getMessage());
             return false;
         }
     }

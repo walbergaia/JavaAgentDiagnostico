@@ -11,7 +11,6 @@ import agent.models.TraceSpan;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.Instant;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -40,15 +39,20 @@ public class StatementTimingAdvice {
         try {
             ConfigLoader config = ConfigLoader.getInstance();
             SqlQueryInfo info = new SqlQueryInfo();
-            info.timestamp = Instant.now().toString();
-            info.durationMs = durMs;
+            // Ajusta tipo de evento para Statement comum
+            info.eventType = "STATEMENT_EXECUTION";
+            // Preenche duração em micros/millis de forma consistente
+            info.setDurationMicros(durMs * 1000);
             info.threadName = Thread.currentThread().getName();
+            info.threadId = Thread.currentThread().getId();
+            info.updateThreadState(Thread.currentThread().getState());
             info.query = sql;
             if (sql.length() > 2000) info.query = sql.substring(0,2000)+"... [truncated]";
             info.normalizedQuery = SqlQueryNormalizer.normalize(info.query);
             info.queryHash = SqlQueryNormalizer.generateHash(info.normalizedQuery);
             info.queryType = extractQueryType(sql);
             info.slow = durMs > config.getSqlSlowThresholdMs();
+            info.queryWithParams = info.query; // Sem parâmetros individuais aqui
             if (result instanceof Integer) info.rowsAffected = (Integer) result;
             if (result instanceof ResultSet) {
                 try { info.fetchSize = ((ResultSet) result).getFetchSize(); } catch (Exception ignored) {}

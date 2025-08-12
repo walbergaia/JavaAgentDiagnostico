@@ -57,9 +57,12 @@ public class SqlAggregationRegistry {
             int c = e.count.get();
             agg.executionCount = c;
             agg.maxDurationMs = e.maxDuration.get();
-            agg.minDurationMs = e.minDuration.get();
-            agg.totalDurationMs = e.totalDuration.get();
-            if (c > 0) agg.avgDurationMs = agg.totalDurationMs / c;
+            long min = e.minDuration.get();
+            if (min == -1) min = 0; // quando nenhum valor definido
+            agg.minDurationMs = min;
+            long total = e.totalDuration.get();
+            agg.totalTimeMs = total;
+            if (c > 0) agg.avgDurationMs = total / c;
             agg.tags.put("aggregated", "true");
             agg.tags.put("slow.count", String.valueOf(e.slowCount.get()));
             out.add(agg);
